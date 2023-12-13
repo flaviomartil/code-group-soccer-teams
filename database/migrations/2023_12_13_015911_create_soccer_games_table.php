@@ -23,6 +23,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('soccergame_id')->constrained('soccergame');
             $table->foreignId('player_id')->constrained('players');
+            $table->integer('team_id');
             $table->timestamps();
         });
     }

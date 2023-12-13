@@ -33,6 +33,11 @@
                 </div>
 
                 <div class="mb-3">
+                    <label for="dataDoJogo" class="form-label">Data do jogo:</label>
+                    <input type="date" class="form-control" name="dataDoJogo"  required>
+                </div>
+
+                <div class="mb-3">
                     <label for="totalJogadoresTime" class="form-label">Total de Jogadores Por Time:</label>
                     <input type="number" class="form-control" name="totalJogadoresTime" min="1" required>
                 </div>

@@ -35,18 +35,20 @@
                     <p>Jogo não encontrado.</p>
                 @endif
 
-                @if (isset($players))
-                    <table class="table table-bordered">
-                        <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nome Completo</th>
-                            <th>Nível</th>
-                            <th>Goleiro</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @foreach($players as $player)
+                @if (isset($teams))
+                        @foreach($teams as $key => $team)
+                        <h3 class="mt-5"> Time {{$key}}</h3>
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome Completo</th>
+                                <th>Nível</th>
+                                <th>Goleiro</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($team as $player)
                             <tr>
                                 <td>{{ $player->id }}</td>
                                 <td>{{ $player->nome }}</td>
@@ -54,13 +56,15 @@
                                 <td>{{ $player->goleiro ? 'Sim' : 'Não' }}</td>
                             </tr>
                         @endforeach
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                        @endforeach
             </div>
+        </div>
+
             @endif
             <a href="{{ route('index') }}" class="btn btn-success">Voltar</a>
 
-        </div>
     </div>
 
 @endsection

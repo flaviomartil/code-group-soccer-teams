@@ -23,9 +23,16 @@ class SoccerGameController extends Controller
             $validator = Validator::make($request->all(), [
                 'nomeDoJogo' => 'required|string',
                 'totalJogadoresTime' => 'required|integer',
+                'dataDoJogo' => 'required|date'
             ]);
 
             $params = $request->all();
+            $dataDoJogo = $params['dataDoJogo'];
+            $dataDoJogoObj = Carbon::createFromFormat('Y-m-d', $dataDoJogo);
+
+            if ($dataDoJogoObj->isPast()) {
+                return redirect()->back()->with('error', 'Essa data já passou.');
+            }
 
             // Verificar se o número total de confirmados é suficiente para o sorteio
             $numeroJogadoresPorTime = $params['totalJogadoresTime'];
@@ -67,6 +74,7 @@ class SoccerGameController extends Controller
                     ->whereRaw('soccergame_players.player_id = players.id');
             })->get();
 
+
             // Ordenar jogadores por nível (opcional)
             $jogadoresConfirmados = $jogadoresConfirmados->sortByDesc('nivel');
 
@@ -82,7 +90,7 @@ class SoccerGameController extends Controller
             // Criar um novo registro na tabela soccergame
             $soccerGame = new SoccerGame([
                 'nome' => 'Nome do Jogo',       // Substitua pelo nome desejado
-                'data' => now(),        // Substitua pela data desejada
+                'data' => $dataDoJogo,        // Substitua pela data desejada
                 'num_jogadores_por_time' => $numeroJogadoresPorTime,        // Substitua pelo valor desejado
             ]);
 
@@ -92,12 +100,19 @@ class SoccerGameController extends Controller
             $time1Players = [];
             $time2Players = [];
 
+            $distribuirJogadores = 0;
             // Distribuir jogadores entre os times
             foreach ($jogadoresConfirmados as $key => $jogador) {
-                $time = ($key % $numeroTimes) + 1;      // Alternar entre os times
+
+                if ($distribuirJogadores < $minimoConfirmados) {
+                    $distribuirJogadores++;
+
+                $time = ($key % $numeroTimes) + 1;
+                // Alternar entre os times
                 $playerData = [
                     'soccergame_id' => $soccerGame->id,
                     'player_id' => $jogador->id,
+                    'team_id' => $time,
                     'created_at' => now(),
                 ];
 
@@ -105,6 +120,7 @@ class SoccerGameController extends Controller
                     $time1Players[] = $playerData;
                 } else {
                     $time2Players[] = $playerData;
+                }
                 }
             }
 
@@ -139,11 +155,18 @@ class SoccerGameController extends Controller
 
             $players = DB::table('soccergame_players')
                 ->join('players', 'soccergame_players.player_id', '=', 'players.id')
-                ->select('players.*')
+                ->select('players.*','soccergame_players.team_id')
                 ->where('soccergame_players.soccergame_id', $soccerGame->id)
-                ->orderBy('nivel','desc')
+                ->orderBy('soccergame_players.team_id','asc')
                 ->get();
-            return view('soccergame/show', ['soccerGame' => $soccerGame, 'players' => $players]);
+
+            $teams = [];
+
+            foreach($players as $player) {
+                $teams[$player->team_id][] = $player;
+            }
+
+            return view('soccergame/show', ['soccerGame' => $soccerGame, 'teams' => $teams]);
         } catch (\Exception $e) {
             return redirect()->route('index')->with('error', 'Jogo não encontrado.');
         }

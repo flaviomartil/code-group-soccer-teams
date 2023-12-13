@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class SoccerGamePlayers extends Model
 {
     protected $table = 'soccergame_players';
-    protected $fillable = ['id', 'soccergame_id','player_id'];
+    protected $fillable = ['id', 'soccergame_id','player_id','team_id'];
 }
