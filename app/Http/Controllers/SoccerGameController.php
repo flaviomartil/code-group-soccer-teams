@@ -28,6 +28,7 @@ class SoccerGameController extends Controller
 
             $params = $request->all();
             $dataDoJogo = $params['dataDoJogo'];
+            $nomeDoJogo = $params['nomeDoJogo'];
             $dataDoJogoObj = Carbon::createFromFormat('Y-m-d', $dataDoJogo);
 
             if ($dataDoJogoObj->isPast()) {
@@ -89,9 +90,9 @@ class SoccerGameController extends Controller
 
             // Criar um novo registro na tabela soccergame
             $soccerGame = new SoccerGame([
-                'nome' => 'Nome do Jogo',       // Substitua pelo nome desejado
-                'data' => $dataDoJogo,        // Substitua pela data desejada
-                'num_jogadores_por_time' => $numeroJogadoresPorTime,        // Substitua pelo valor desejado
+                'nome' => $nomeDoJogo,
+                'data' => $dataDoJogo,
+                'num_jogadores_por_time' => $numeroJogadoresPorTime,
             ]);
 
             $soccerGame->save();
