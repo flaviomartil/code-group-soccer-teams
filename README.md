@@ -1,11 +1,11 @@
-Its a challange for join company.
-For install project download it.
-Run docker-compose up -d 
-After that run:
-docker-compose exec php bash
-on bash type composer install
-and run:
-chmod 777 storage/ -R
+Its a challange for join company. <br>
+For install project download it. <br>
+Run docker-compose up -d <br>
+After that run: <br>
+docker-compose exec php bash <br>
+on bash type composer install <br>
+and run:<br>
+chmod 777 storage/ -R <br>
 
 Here you can check the games:
 ![image](https://github.com/flaviomartil/code-group-soccer-teams/assets/60192455/2c23b9d0-0649-4cf4-8f1a-50af06e260ef)
