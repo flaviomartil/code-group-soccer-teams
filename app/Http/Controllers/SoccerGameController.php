@@ -64,7 +64,6 @@ class SoccerGameController extends Controller
                 return redirect()->back()->with('error', 'Número insuficiente de goleiros confirmados para o sorteio.');
             }
 
-
             // Obter jogadores confirmados
             $jogadoresConfirmados = Player::where('confirmado', true)->whereNotExists(function ($query) {
                 $query->select(DB::raw(1))
@@ -124,6 +123,9 @@ class SoccerGameController extends Controller
             $distribuirJogadores = 1;
             // Distribuir jogadores entre os times
             foreach ($jogadoresConfirmados as $key => $jogador) {
+               if ($jogador->goleiro) {
+                   continue;
+               }
 
                 if ($distribuirJogadores < $minimoConfirmados) {
 
