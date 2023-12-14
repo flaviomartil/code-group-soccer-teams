@@ -20,6 +20,7 @@ class SoccerGameController extends Controller
     public function realizarSorteio(Request $request)
     {
         try {
+            DB::beginTransaction();
             $validator = Validator::make($request->all(), [
                 'nomeDoJogo' => 'required|string',
                 'totalJogadoresTime' => 'required|integer',
@@ -60,7 +61,7 @@ class SoccerGameController extends Controller
                     ->whereRaw('soccergame_players.player_id = players.id');
             })->count();
 
-            if ($goleirosConfirmados < $maximoGoleirosPorTime) {
+            if ($goleirosConfirmados < $maximoGoleirosPorTime * 2) {
                 return redirect()->back()->with('error', 'Número insuficiente de goleiros confirmados para o sorteio.');
             }
 
@@ -151,16 +152,18 @@ class SoccerGameController extends Controller
 
             // Garantir que cada time tenha pelo menos $numeroJogadoresPorTime jogadores
             if ($jogadoresPorTime > count($time1Players) || $jogadoresPorTime > count($time2Players)) {
-                return redirect()->back()->with('error', 'Número insuficiente de jogadores confirmados para formar times.');
+                throw new \Exception('Número insuficiente de jogadores confirmados para formar times.');
             }
 
             // Inserir jogadores na tabela soccergame_players
             SoccerGamePlayers::insert($time1Players);
             SoccerGamePlayers::insert($time2Players);
-
+            DB::commit();
             return redirect()->back()->with('success', 'Sorteio realizado com sucesso!');
         } catch (\Exception $e) {
-            return redirect()->back()->withErrors($validator)->with('error', 'Erro ao cadastrar sorteio!');
+            DB::rollback();
+            $msg = !empty($e->getMessage()) ? $e->getMessage() : 'Erro ao cadastrar sorteio';
+            return redirect()->back()->withErrors($validator)->with('error', $msg);
         }
     }
 
