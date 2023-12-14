@@ -79,11 +79,6 @@ class SoccerGameController extends Controller
             $numeroTimes = 2;
             $jogadoresPorTime = floor($totalConfirmados / $numeroTimes);
 
-            // Garantir que cada time tenha pelo menos $numeroJogadoresPorTime jogadores
-            if ($jogadoresPorTime < $numeroJogadoresPorTime) {
-                return redirect()->back()->with('error', 'Número insuficiente de jogadores confirmados para formar times.');
-            }
-
             // Criar um novo registro na tabela soccergame
             $soccerGame = new SoccerGame([
                 'nome' => $nomeDoJogo,
@@ -97,8 +92,7 @@ class SoccerGameController extends Controller
             $time1Players = [];
             $time2Players = [];
 
-            $goleiros = $jogadoresConfirmados->where('goleiro', true);
-
+            $goleiros = $jogadoresConfirmados->where('goleiro', true)->where('confirmado', true);
 
             $time1Players[] = [
                 'soccergame_id' => $soccerGame->id,
@@ -153,6 +147,11 @@ class SoccerGameController extends Controller
                         $time2Players[] = $playerData;
                 }
                 }
+            }
+
+            // Garantir que cada time tenha pelo menos $numeroJogadoresPorTime jogadores
+            if ($jogadoresPorTime > count($time1Players) || $jogadoresPorTime > count($time2Players)) {
+                return redirect()->back()->with('error', 'Número insuficiente de jogadores confirmados para formar times.');
             }
 
             // Inserir jogadores na tabela soccergame_players
