@@ -63,7 +63,7 @@ class PlayerController extends Controller
             $request->validate([
                 'nome' => 'required|string|max:255',
                 'nivel' => 'required|integer|between:1,5',
-                'is_goleiro' => 'required|boolean',
+                'goleiro' => 'required|boolean',
                 'confirmado' => 'required|boolean',
             ]);
 

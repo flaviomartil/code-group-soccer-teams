@@ -32,10 +32,10 @@
                         </div>
 
                         <div class="form-group mb-3"> <!-- Adicionado margem inferior aqui -->
-                            <label for="is_goleiro">Goleiro:</label>
-                            <select name="is_goleiro" id="is_goleiro" class="form-control" required>
-                                <option value="1" {{ $player->is_goleiro ? 'selected' : '' }}>Sim</option>
-                                <option value="0" {{ !$player->is_goleiro ? 'selected' : '' }}>Não</option>
+                            <label for="goleiro">Goleiro:</label>
+                            <select name="goleiro" id="goleiro" class="form-control" required>
+                                <option value="1" {{ $player->goleiro ? 'selected' : '' }}>Sim</option>
+                                <option value="0" {{ !$player->goleiro ? 'selected' : '' }}>Não</option>
                             </select>
                         </div>
 

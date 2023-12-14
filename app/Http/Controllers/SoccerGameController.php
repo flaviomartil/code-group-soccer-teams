@@ -64,9 +64,6 @@ class SoccerGameController extends Controller
                 return redirect()->back()->with('error', 'Número insuficiente de goleiros confirmados para o sorteio.');
             }
 
-            if ($goleirosConfirmados > $maximoGoleirosPorTime * 2) {
-                return redirect()->back()->with('error', 'Número de goleiros está acima do permitido, apenas um por time.');
-            }
 
             // Obter jogadores confirmados
             $jogadoresConfirmados = Player::where('confirmado', true)->whereNotExists(function ($query) {
@@ -101,15 +98,46 @@ class SoccerGameController extends Controller
             $time1Players = [];
             $time2Players = [];
 
-            $distribuirJogadores = 0;
+            $goleiros = $jogadoresConfirmados->where('goleiro', true);
+
+
+            $time1Players[] = [
+                'soccergame_id' => $soccerGame->id,
+                'player_id' => $goleiros->shift()->id,
+                'team_id' => 1,
+                'created_at' => now(),
+            ];
+
+            // Adicionar goleiro ao segundo time
+            $time2Players[] = [
+                'soccergame_id' => $soccerGame->id,
+                'player_id' => $goleiros->shift()->id,
+                'team_id' => 2,
+                'created_at' => now(),
+            ];
+
+            $goleirosId = array_merge(
+                array_column($time1Players, 'player_id'),
+                array_column($time2Players, 'player_id')
+            );
+
+            $distribuirJogadores = 1;
             // Distribuir jogadores entre os times
             foreach ($jogadoresConfirmados as $key => $jogador) {
 
                 if ($distribuirJogadores < $minimoConfirmados) {
-                    $distribuirJogadores++;
 
                 $time = ($key % $numeroTimes) + 1;
                 // Alternar entre os times
+
+                if (!in_array($jogador->id,$goleirosId)) {
+                    $goleirosId[] = $jogador->id;
+                }    else {
+                    continue;
+                }
+
+                    $distribuirJogadores++;
+
                 $playerData = [
                     'soccergame_id' => $soccerGame->id,
                     'player_id' => $jogador->id,
@@ -118,9 +146,9 @@ class SoccerGameController extends Controller
                 ];
 
                 if ($time === 1) {
-                    $time1Players[] = $playerData;
+                        $time1Players[] = $playerData;
                 } else {
-                    $time2Players[] = $playerData;
+                        $time2Players[] = $playerData;
                 }
                 }
             }
